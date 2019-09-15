@@ -1,7 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>BanallyMe.QuickReflect</RootNamespace>
+    <PackageId>BanallyMe.QuickReflect</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Dominik Zilliken</Authors>
+    <Company>BanallyMe</Company>
+    <Product>BanallyMe.QuickReflect</Product>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageProjectUrl>https://github.com/BanallyMe/QuickReflect</PackageProjectUrl>
+    <RepositoryType></RepositoryType>
+    <RepositoryUrl>https://github.com/BanallyMe/QuickReflect</RepositoryUrl>
+    <Copyright>2019 Dominik Zilliken</Copyright>
+    <Description>Provides shortcuts and extensions for .NET's standard reflection library.</Description>
   </PropertyGroup>
 
 </Project>
