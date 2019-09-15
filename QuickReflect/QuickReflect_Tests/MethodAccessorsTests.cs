@@ -4,8 +4,7 @@ using System.Text;
 
 namespace QuickReflect_Tests
 {
-    public class AsyncReflectionTests
+    public class MethodAccessorsTests
     {
-
     }
 }

@@ -25,6 +25,11 @@ namespace BanallyMe.QuickReflect
                 throw new ArgumentNullException(nameof(containingObject),"Cannot access property on a null object.");
             }
 
+            if (propertyName == null)
+            {
+                throw new ArgumentException("Cannot access null-named property.", nameof(propertyName));
+            }
+
             var containingObjectType = containingObject.GetType();
             var accessedProperty = containingObjectType.GetProperty(propertyName);
             if (accessedProperty == null)
@@ -65,6 +70,7 @@ namespace BanallyMe.QuickReflect
         /// </summary>
         /// <param name="objectToRead">Object to read properties and values from.</param>
         /// <returns>Array of all properties and their coresponding values where the values are not null.</returns>
+        /// <exception cref="ArgumentNullException">Traversed object is null.</exception>
         public static PropertyValuePair[] GetNonNullPropertiesAndValues(this object objectToRead)
         {
             if (objectToRead == null)

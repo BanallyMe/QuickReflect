@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>BanallyMe.QuickReflect</RootNamespace>
     <PackageId>BanallyMe.QuickReflect</PackageId>
-    <Version>0.1.1</Version>
+    <Version>0.1.2</Version>
     <Authors>Dominik Zilliken</Authors>
     <Company>BanallyMe</Company>
     <Product>BanallyMe.QuickReflect</Product>
