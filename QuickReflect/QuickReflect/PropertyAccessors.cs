@@ -1,4 +1,7 @@
-﻿using System;
+﻿using BanallyMe.QuickReflect.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BanallyMe.QuickReflect
 {
@@ -30,6 +33,50 @@ namespace BanallyMe.QuickReflect
             }
 
             return accessedProperty.GetValue(containingObject);
+        }
+
+        /// <summary>
+        /// Sets a given value on all properties of an object, that have the same type as the value that should be set.
+        /// </summary>
+        /// <param name="containingObject">Object whose properties are being set.</param>
+        /// <param name="valueToSet">Value that will be set on the object's properties.</param>
+        /// <exception cref="ArgumentNullException">Thrown if containingObject or valueToSet are null.</exception>
+        public static void SetPropertiesByValueType(this object containingObject, object valueToSet)
+        {
+            if (containingObject == null)
+            {
+                throw new ArgumentNullException(nameof(containingObject), "Cannot read properties of a null object.");
+            }
+
+            if (valueToSet == null)
+            {
+                throw new ArgumentNullException(nameof(valueToSet), $"Cannot set values to null via the '{nameof(SetPropertiesByValueType)}'-method");
+            }
+            var valueType = valueToSet.GetType();
+            var propertiesToSet = containingObject
+                .GetType()
+                .GetProperties()
+                .Where(property => property.PropertyType == valueType);
+            Parallel.ForEach(propertiesToSet, property => property.SetValue(containingObject, valueToSet));
+        }
+
+        /// <summary>
+        /// Read all properties and values from an object where the property's value is not null.
+        /// </summary>
+        /// <param name="objectToRead">Object to read properties and values from.</param>
+        /// <returns>Array of all properties and their coresponding values where the values are not null.</returns>
+        public static PropertyValuePair[] GetNonNullPropertiesAndValues(object objectToRead)
+        {
+            if (objectToRead == null)
+            {
+                throw new ArgumentNullException(nameof(objectToRead), "Cannot read properties from a null object.");
+            }
+
+            return objectToRead.GetType()
+                .GetProperties()
+                .Where(property => property.GetValue(objectToRead) != null)
+                .Select(property => PropertyValuePair.CreateFromObjectsProperty(objectToRead, property))
+                .ToArray();
         }
     }
 }
