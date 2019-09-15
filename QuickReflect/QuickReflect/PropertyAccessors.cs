@@ -65,7 +65,7 @@ namespace BanallyMe.QuickReflect
         /// </summary>
         /// <param name="objectToRead">Object to read properties and values from.</param>
         /// <returns>Array of all properties and their coresponding values where the values are not null.</returns>
-        public static PropertyValuePair[] GetNonNullPropertiesAndValues(object objectToRead)
+        public static PropertyValuePair[] GetNonNullPropertiesAndValues(this object objectToRead)
         {
             if (objectToRead == null)
             {
