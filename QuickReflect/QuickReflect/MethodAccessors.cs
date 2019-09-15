@@ -37,7 +37,7 @@ namespace BanallyMe.QuickReflect
                 throw new ArgumentNullException(nameof(containingObject), "A method of a null reference cannot be invoked.");
             }
             var containingObjectType = containingObject.GetType();
-            var methodToInvoke = containingObjectType?.GetMethod(methodName);
+            var methodToInvoke = containingObjectType.GetMethod(methodName);
             if (methodToInvoke == null)
             {
                 throw new ArgumentException($"Method '{methodName}' does not exist on object of type {containingObjectType.AssemblyQualifiedName}");
