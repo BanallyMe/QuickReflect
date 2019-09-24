@@ -84,5 +84,22 @@ namespace BanallyMe.QuickReflect
                 .Select(property => PropertyValuePair.CreateFromObjectsProperty(objectToRead, property))
                 .ToArray();
         }
+
+        /// <summary>
+        /// Looks for properties of an object, which are decorated with the given TAttribute and returns these objects and their attributes
+        /// of type TAttribute.
+        /// </summary>
+        /// <typeparam name="TAttribute">Type of Attribute, the properties should be decorated with.</typeparam>
+        /// <param name="objectToRead">Object to read properties and attributes from.</param>
+        /// <returns>Array of Properties and their corresponding Attributes.</returns>
+        public static PropertyAttributesPair<TAttribute>[] GetPropertiesWithAttribute<TAttribute>(this object objectToRead) where TAttribute : Attribute
+        {
+            if(objectToRead == null)
+            {
+                throw new ArgumentNullException(nameof(objectToRead), "Cannot read properties from a null object.");
+            }
+
+            return PropertyAttributesPair<TAttribute>.CreateFromObjectsProperty(objectToRead);
+        }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using BanallyMe.QuickReflect;
+using BanallyMe.QuickReflect.Models;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace QuickReflect_Tests
@@ -104,6 +106,77 @@ namespace QuickReflect_Tests
             Assert.Equal(3, testObj.intProperty3);
         }
 
+        [Fact]
+        public void PropertyAccessors_GetPropertiesWithAttributes_ContainingObjectIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => PropertyAccessors.GetPropertiesWithAttribute<TestAttribute>(null));
+        }
+
+        [Fact]
+        public void PropertyAccessors_GetPropertiesWithAttributes_ClassWithoutAttributes()
+        {
+            var testObj = new PropertyAccessorsTestClass();
+            var propertyAttributesPairs = testObj.GetPropertiesWithAttribute<TestAttribute>();
+            Assert.Empty(propertyAttributesPairs);
+        }
+
+        [Fact]
+        public void PropertyAccessors_GetPropertiesWithAttributes_ClassWithSingleAttributes()
+        {
+            Test_GetPropertiesWithAttributes_UsingTestClass<AttributesContainingTestClass>(
+                new PropertyAttributeValues(nameof(AttributesContainingTestClass.stringProperty1), new[] { 1 }),
+                new PropertyAttributeValues(nameof(AttributesContainingTestClass.intProperty1), new[] { 2 })
+            );
+        }
+
+        [Fact]
+        public void PropertyAccessors_GetPropertiesWithAttributes_ClassWithMultipleAttributes()
+        {
+            Test_GetPropertiesWithAttributes_UsingTestClass<MultipleAttributesContainingTestClass>(
+                new PropertyAttributeValues(nameof(AttributesContainingTestClass.stringProperty1), new[] { 1, 2 }),
+                new PropertyAttributeValues(nameof(AttributesContainingTestClass.intProperty1), new[] { 3 }),
+                new PropertyAttributeValues(nameof(AttributesContainingTestClass.intProperty3), new[] { 4, 5, 6 })
+            );
+        }
+        
+        private void Test_GetPropertiesWithAttributes_UsingTestClass<TTestClass>(params PropertyAttributeValues[] expectedPairs)
+        {
+            var testObj = Activator.CreateInstance<TTestClass>();
+            var propertyAttributesPairs = testObj.GetPropertiesWithAttribute<TestAttribute>();
+            Assert.Collection(propertyAttributesPairs, AssertPropertyAttributePairs(expectedPairs));
+        }
+
+
+        private Action<PropertyAttributesPair<TestAttribute>>[] AssertPropertyAttributePairs(params PropertyAttributeValues[] expectedPairs)
+        {
+            return expectedPairs
+                .Select<PropertyAttributeValues, Action<PropertyAttributesPair<TestAttribute>>>(pair => delegate (PropertyAttributesPair<TestAttribute> propAttrPair)
+                {
+                    Assert.Equal(pair.PropertyName, propAttrPair.Property.Name);
+                    Assert.Collection(propAttrPair.Attributes, AssertPropertyAttributes(pair.AttributeValues));
+                })
+                .ToArray();
+        }
+
+        private Action<TestAttribute>[] AssertPropertyAttributes(params int[] values)
+        {
+            return values
+                .Select<int, Action<TestAttribute>>(value => delegate (TestAttribute attribute) { Assert.Equal(value, attribute.TestValue); })
+                .ToArray();
+        }        
+
+        private class PropertyAttributeValues
+        {
+            public PropertyAttributeValues(string propertyName, int[] attributeValues)
+            {
+                PropertyName = propertyName;
+                AttributeValues = attributeValues;
+            }
+
+            public string PropertyName { get; set; }
+            public int[] AttributeValues { get; set; }
+        }
+
         private class OnlyNullPropertiesTestClass
         {
             public string stringProperty1 { get; set; } = null;
@@ -118,6 +191,45 @@ namespace QuickReflect_Tests
             public int intProperty1 { get; set; } = 1;
             public int intProperty2 { get; set; } = 2;
             public int intProperty3 { get; set; } = 3;
+        }
+
+        private class AttributesContainingTestClass
+        {
+            [Test(1)]
+            public string stringProperty1 { get; set; } = null;
+            public string stringProperty2 { get; set; } = "abc";
+            public string stringProperty3 { get; set; } = "def";
+            [Test(2)]
+            public int intProperty1 { get; set; } = 1;
+            public int intProperty2 { get; set; } = 2;
+            public int intProperty3 { get; set; } = 3;
+        }
+
+        private class MultipleAttributesContainingTestClass
+        {
+            [Test(1)]
+            [Test(2)]
+            public string stringProperty1 { get; set; } = null;
+            public string stringProperty2 { get; set; } = "abc";
+            public string stringProperty3 { get; set; } = "def";
+            [Test(3)]
+            public int intProperty1 { get; set; } = 1;
+            public int intProperty2 { get; set; } = 2;
+            [Test(4)]
+            [Test(5)]
+            [Test(6)]
+            public int intProperty3 { get; set; } = 3;
+        }
+
+        [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+        private class TestAttribute : Attribute
+        {
+            public TestAttribute(int testValue)
+            {
+                TestValue = testValue;
+            }
+
+            public int TestValue { get; }
         }
     }
 }
